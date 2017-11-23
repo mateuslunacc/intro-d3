@@ -54,8 +54,8 @@
                       .enter()
                         .append('rect')
                         .attr('x', 0) // Que tal uma função com dois parâmetros: d e i?
-                        .attr('y', 0)
-                        .attr('width', 30)
+                        .attr('y', function(d, i) {return 25*i})
+                        .attr('width', function(d, i) { return 2*d})
                         .attr('height', 20);
 
       /* Mais dicas :
@@ -69,3 +69,4 @@
     </script>
   </body>
 </html>
+
