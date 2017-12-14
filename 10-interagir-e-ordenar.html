@@ -147,6 +147,9 @@
               .style("font-weight",
                       p => p.nome_curto === d.nome_curto ? "bold" : "normal");
 
+            d3.selectAll("rect")
+              .style("stroke", p => p.nome_curto === d.nome_curto ? "#2d0526" : "#D3F6DB");
+
             d3.select("#tooltip") // reparou que tem uma div escondida no html?
   						.style("left", (d3.event.pageX - 50) + "px")
   						.style("top", d3.event.pageY + "px")
@@ -162,6 +165,9 @@
           function mouseSaiu(d){
             d3.selectAll("text")
               .style("font-weight", "normal");
+
+            d3.selectAll("rect")
+              .style("stroke", "white");
 
             // não precisamos mais de tooltip
             d3.select("#tooltip").classed("hidden", true);
@@ -182,18 +188,31 @@
           function mudaDimensaoEReordena(dimensao) {
             dimensaoSelecionada = dimensao
             // necessario para reordenar as barras/nomes
-            // var nomesOrdenados = dados.map(d => d.nome_curto)
-            //                           .sort((a, b) => d3.ascending(a[dimensao], b[dimensao]))
-            // y.domain(nomesOrdenados)
+            var nomesOrdenados = dados
+                                      .sort((a, b) => d3.ascending(a[dimensao], b[dimensao]))
+                                      .map(d => d.nome_curto)
+            y.domain(nomesOrdenados)
 
             var maxValue = d3.max(dados, d => parseFloat(d[dimensao]))
+            
+            var colorScale = d3.scaleQuantize()
+            					.domain([0, maxValue])
+            					.range(colorbrewer.Greens[5])
 
             escalaLargura = escalaLargura.domain([0, maxValue])
 
             grafico.selectAll("rect")
-              //.sort((a, b) => b[dimensao] - a[dimensao]) // necessario na hora de reordenar os retângulos
+              .sort((a, b) => b[dimensao] - a[dimensao]) // necessario na hora de reordenar os retângulos
               .transition().duration(300).delay((d,i) => i * 20)
               .attr("width", d => escalaLargura(d[dimensao]))
+              .style("fill", d => colorScale(d[dimensao]))
+              .attr("y", d => y(d.nome_curto))
+
+
+            grafico.selectAll("rect")
+            			.attr("y", d => y(d.nome_curto))
+                        .text(d => d.nome_curto)
+
 
           }
         }
